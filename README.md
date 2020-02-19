@@ -3,7 +3,8 @@
 
 Unfortunately, Discord does not offer a function to remove all user data from a server; even upon
 account deletion any messages you sent in a server will persist. This program will search a
-server for every message you sent (in all channels) and delete each one.
+server for every message you sent (in all channels) and delete each one. This will not work for
+private messages.
 
 NOTE (!!!):
 Running this script will (probably) break Discord's TOS against self-botting. So it should really
@@ -57,3 +58,10 @@ optional arguments:
   -h, --help         show this help message and exit
   -c CAP, --cap CAP  Cap the amount of messages deleted to a server
 ```
+
+## Roadmap
+- Add support for Discord PM deletion
+- More complex filters such as date/time
+
+## License
+MIT
