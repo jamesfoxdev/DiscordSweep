@@ -24,14 +24,15 @@ Three pieces of data are needed in order for DiscordSweep to do its job
 2. Your unique Discord user ID (18 numbers)
 3. A valid Discord authorization token (upper and lowercase letters mixed with dashes and periods)
 
-To find the server ID:
+#### To find the server ID:
 1. Right click on the server you want to delete the messages from in the server browser
 2. Click `Copy ID`
 
-To find your user ID:
+#### To find your user ID:
 1. Right click on your user on the users panel
 2. Click `Copy ID`
 
+#### To find a valid authorization token
 The easiest way to retrieve an authorization token is through inspecting Discord XHR calls:
 1. In the Discord GUI window hit `CTRL`+`SHIFT`+`I`
 2. Navigate to the `Network` tab
