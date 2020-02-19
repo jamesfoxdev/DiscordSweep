@@ -113,7 +113,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("serverID", help="Server ID to wipe from", type=str)
 parser.add_argument("userID", help="Your Discord user ID")
 parser.add_argument("authToken", help="Discord authorization token", type=str)
-parser.add_argument("-c", "--cap", help="Cap the amount of messages deleted to a server", type=int)
+parser.add_argument("-c", "--cap", help="Cap the amount of messages to delete", type=int)
 args = parser.parse_args()
 
 print(banner)
