@@ -1,17 +1,29 @@
 #!/usr/bin/env python3
+import argparse
 import requests
 from time import sleep
 
-# Change these (shown values are examples only):
-SERVER_ID = "197764812709036032"
-USER_ID = "252274070962366816"
-AUTH_TOKEN = "MjUyNTcxMDcwOTYyNDs2ODE2.Xkjamw.tFax0g9SdUj3lrLmbRw2Lw3JdCc"
-DELETE_CAP = None
+banner = r'''
+ (                           (                         
+ )\ )                   (    )\ )                      
+(()/( (            (    )\ )(()/((  (     (   (        
+ /(_)))\ (   (  (  )(  (()/( /(_))\))(   ))\ ))\`  )   
+(_))_((_))\  )\ )\(()\  ((_)|_))((_)()\ /((_)((_)(/(   
+ |   \(_|(_)((_|(_)((_) _| |/ __|(()((_|_))(_))((_)_\  
+ | |) | (_-< _/ _ \ '_/ _` |\__ \ V  V / -_) -_) '_ \) 
+ |___/|_/__|__\___/_| \__,_||___/\_/\_/\___\___| .__/  
+                                               |_|     
+
+====> Author: James Fox (@jamesfoxdev)
+====> Repo: github.com/jamesfoxdev
+====> License: MIT
+
+'''
 
 API_URL = "https://discordapp.com/api/v6/"
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) discord/0.0.9 Chrome/69.0.3497.128 Electron/4.0.8 Safari/537.36"
 
-def retreiveMessages():
+def retreiveMessages(serverID, userID, authToken, deleteCap=None):
     deleteList = []
     offset = 0
     lastLength = 0
@@ -21,15 +33,15 @@ def retreiveMessages():
             print(f"[ERROR] Retry cap ({retryCap}) hit, exiting...")
             exit(1)
 
-        if len(deleteList) == DELETE_CAP:
+        if len(deleteList) == deleteCap:
             print("[INFO] Delete cap reached, moving on.")
             return deleteList
 
-        searchRes = requests.get(f"{API_URL}guilds/{SERVER_ID}/messages/search", headers={
-            "authorization":AUTH_TOKEN,
+        searchRes = requests.get(f"{API_URL}guilds/{serverID}/messages/search", headers={
+            "authorization":authToken,
             "user-agent":USER_AGENT
         }, params={
-            "author_id":USER_ID,
+            "author_id":userID,
             "offset":offset
         })
 
@@ -62,7 +74,7 @@ def retreiveMessages():
         for messageBlock in dcResp["messages"]:
             for message in messageBlock:
                 # Only add to the delete list if the message author matches our user and isn't added already
-                if message["author"]["id"] == USER_ID and not any(d["mid"] == message["id"] for d in deleteList):
+                if message["author"]["id"] == userID and not any(d["mid"] == message["id"] for d in deleteList):
                     deleteList.append({
                         "cid":message["channel_id"],
                         "mid":message["id"]
@@ -79,10 +91,10 @@ def retreiveMessages():
 
     return deleteList
 
-def deleteMessages(messages):
+def deleteMessages(messages, authToken):
     for message in messages:
         deleteRes = requests.delete(f"{API_URL}/channels/{message['cid']}/messages/{message['mid']}", headers={
-            "authorization":AUTH_TOKEN,
+            "authorization":authToken,
             "user-agent":USER_AGENT
         })
 
@@ -97,7 +109,17 @@ def deleteMessages(messages):
             except:
                 continue
 
-deleteList = retreiveMessages()
+parser = argparse.ArgumentParser()
+parser.add_argument("serverID", help="Server ID to wipe from", type=str)
+parser.add_argument("userID", help="Your Discord user ID")
+parser.add_argument("authToken", help="Discord authorization token", type=str)
+parser.add_argument("-c", "--cap", help="Cap the amount of messages deleted to a server", type=int)
+args = parser.parse_args()
+
+print(banner)
+print(f"[INFO] Searching for messages from user {args.userID} in {args.serverID}")
+
+deleteList = retreiveMessages(args.serverID, args.userID, args.authToken, deleteCap=args.cap)
 print(f"[SUCCESS] Retreived all messages ({len(deleteList)}) from the server. Deleting...")
-deleteMessages(deleteList)
+deleteMessages(deleteList, args.authToken)
 print("[SUCCESS] Done!")
